@@ -106,31 +106,28 @@
   </div>
 
   <script type="module">
-    // 1) PASTE YOUR FIREBASE CONFIG BELOW (from Firebase Console → Project settings → General → Your apps → SDK setup & configuration)
-    // Example structure:
-    // const firebaseConfig = {
-    //   apiKey: "AIzaSyClFRc0zUL5RlBJXOLqzAF_mqGEUTPJmhQ",
-    //   authDomain: "…",
-    //   projectId: "trial-17e6a",
-    //   storageBucket: "trial-17e6a.firebasestorage.app",
-    //   messagingSenderId: "…",
-    //   appId: "1:152248627473:android:3b99b64c301610ba571cb0"
-    // };
+    // Your Firebase config
     const firebaseConfig = {
-      // TODO: "AIzaSyClFRc0zUL5RlBJXOLqzAF_mqGEUTPJmhQ"
+      apiKey: "AIzaSyB6lJ0qAoiFY72MKtzcTFCdVBaOv5-vqtA",
+      authDomain: "student-marks-app-dc6c3.firebaseapp.com",
+      projectId: "student-marks-app-dc6c3",
+      storageBucket: "student-marks-app-dc6c3.firebasestorage.app",
+      messagingSenderId: "412370498316",
+      appId: "1:412370498316:web:3cd36ec52d5be3eb524f29",
+      measurementId: "G-EC3WCXXFS9"
     };
 
-    // 2) Firebase SDK imports (v10). If your console suggests another version, you can adjust the URLs.
+    // Firebase SDK imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // 3) Init Firebase
+    // Init Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // 4) Anonymous sign-in (for demo only). Restrict with Firestore rules.
+    // Anonymous sign-in
     const authStatus = document.getElementById('authStatus');
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -156,7 +153,6 @@
     const filterSubject = document.getElementById('filterSubject');
     const exportBtn = document.getElementById('exportBtn');
 
-    // Local cache of rows
     let rows = [];
 
     function normalize(s){ return (s||'').toString().trim(); }
@@ -201,7 +197,6 @@
       if (subjects.includes(sVal)) filterSubject.value = sVal; else filterSubject.value = '';
     }
 
-    // Live updates from Firestore
     const marksCol = collection(db, 'marks');
     onSnapshot(query(marksCol, orderBy('createdAt', 'desc')), (snap) => {
       rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -209,7 +204,6 @@
       render();
     });
 
-    // Add new document
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const docData = {
@@ -246,7 +240,6 @@
 
     resetBtn.addEventListener('click', () => { form.reset(); rollNo.focus(); });
 
-    // Delete handler (event delegation)
     tbody.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (btn && btn.dataset.id) {
@@ -261,10 +254,8 @@
       }
     });
 
-    // Search & filter
     [search, filterClass, filterSubject].forEach(el => el.addEventListener('input', render));
 
-    // Export CSV
     exportBtn.addEventListener('click', () => {
       const headers = ['Roll No', 'Name', 'Class', 'Subject', 'Marks'];
       const data = rows.map(r => [r.rollNo, r.name, r.studentClass||'', r.subject||'', r.marks]);
@@ -276,10 +267,5 @@
       URL.revokeObjectURL(url);
     });
   </script>
-
-  <!-- Tips:
-    1) If you see CORS or permission errors, fix Firestore Security Rules and enable Anonymous Auth.
-    2) For production, use proper sign-in (Email/Password) and restrict rules by user.
-  -->
 </body>
 </html>
